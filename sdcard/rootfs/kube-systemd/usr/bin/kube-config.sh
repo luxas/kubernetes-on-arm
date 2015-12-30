@@ -381,7 +381,7 @@ start-worker(){
 	updateconfig K8S_MASTER_IP $IP
 
 	# Check if we have a connection
-	if [[ $(checkformaster) != "OK" ]]; then
+	if [[ $(checkformaster $IP) != "OK" ]]; then
 		cat <<EOF
 Kubernetes Master IP is required.
 Value right now: $IP
@@ -601,7 +601,7 @@ case $1 in
         'enable-master')
                 start-master;;
         'enable-worker')
-                start-worker;;
+                start-worker $2;;
         'enable-addon')
 				start-addon $2;;
 
