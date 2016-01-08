@@ -7,7 +7,7 @@ mountpartitions(){
 	case $MACHINENAME in
 		rpi|rpi-2|parallella)
 			generalformat 100;; # Make 100 MB fat partition for the RPi
-		cubietruck|bananapro)
+		cubietruck|bananapro|odroid-c1)
 			allwinnerformat;;
 		*)
 			exit;;
@@ -21,6 +21,8 @@ initos(){
 			generaldownload;;
 		cubietruck|bananapro)
 			allwinnerdownload;;
+		odroid-c1)
+			odroid-c1download;;
 		*)
 			exit;;
 	esac
@@ -31,7 +33,7 @@ cleanup(){
 	case $MACHINENAME in
 		rpi|rpi-2|parallella)
 			umount_boot_and_root;;
-		cubietruck|bananapro)
+		cubietruck|bananapro|odroid-c1)
 			umount_root;;
 		*)
 			exit;;
@@ -145,6 +147,18 @@ allwinnerdownload(){
 	dd if=$TMPDIR/u-boot-sunxi-with-spl.bin of=$SDCARD bs=1024 seek=8
 
 	curl -sSL http://archlinuxarm.org/os/sunxi/boot/cubietruck/boot.scr > $ROOT/boot/boot.scr
+}
+
+odroid-c1download(){
+	# Download, redirect stderr (all errors) to stdout, which in turn is appended to a log file
+	curl -sSL -k http://archlinuxarm.org/os/ArchLinuxARM-${MACHINENAME}-latest.tar.gz | tar -xz -C $ROOT >> $LOGFILE 2>&1
+
+	sync
+
+	PREVIOUS_PATH=$(pwd)
+	cd $ROOT/boot
+	./sd_fusing.sh $SDCARD
+	cd $PREVIOUS_PATH
 }
 
 umount_root(){
