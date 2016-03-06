@@ -15,7 +15,7 @@ ExecStart=/bin/sh -c "exec docker run \
 					-v /sys:/sys:ro \
 					-v /dev:/dev \
 					-v /var/lib/docker/:/var/lib/docker:rw \
-					-v /var/lib/kubelet:/var/lib/kubelet:shared \
+					-v /var/lib/kubelet:/var/lib/kubelet:rw \
 					-v /var/run:/var/run:rw \
 					--privileged \
 					kubernetesonarm/hyperkube \
