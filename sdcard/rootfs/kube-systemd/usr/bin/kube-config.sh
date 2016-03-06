@@ -4,6 +4,10 @@
 trap 'exit' ERR
 set -e
 
+if [[ $K8S_DEBUG == 1 ]]; then
+	set -x
+fi
+
 KUBERNETES_DIR=/etc/kubernetes
 ADDONS_DIR=$KUBERNETES_DIR/addons
 KUBERNETES_CONFIG=$KUBERNETES_DIR/k8s.conf
@@ -11,7 +15,7 @@ PROJECT_SOURCE=$KUBERNETES_DIR/source
 K8S_PREFIX="kubernetesonarm"
 GCR_PREFIX="gcr.io/google_containers"
 
-DOCKER_DROPIN_DIR="/usr/lib/systemd/system/docker.service.d/"
+DOCKER_DROPIN_DIR="/usr/lib/systemd/system/docker.service.d"
 
 # The images that are required
 REQUIRED_MASTER_IMAGES=("$K8S_PREFIX/flannel $K8S_PREFIX/etcd $K8S_PREFIX/hyperkube $K8S_PREFIX/pause")
@@ -24,6 +28,8 @@ STATIC_DOCKER_DOWNLOAD="https://github.com/luxas/kubernetes-on-arm/releases/down
 DEFAULT_TIMEZONE="Europe/Helsinki"
 DEFAULT_HOSTNAME="kubepi"
 
+TIMEOUT_FOR_SERVICES=20
+
 LATEST_DOWNLOAD_RELEASE="v0.6.2"
 
 # If the config doesn't exist, create
@@ -31,6 +37,7 @@ if [[ ! -f $KUBERNETES_CONFIG ]]; then
 	cat > $KUBERNETES_CONFIG <<EOF
 K8S_MASTER_IP=127.0.0.1
 FLANNEL_SUBNET=10.1.0.0/16
+FLANNEL_BACKEND=host-gw
 DNS_DOMAIN=cluster.local
 DNS_IP=10.0.0.10
 EOF
@@ -247,14 +254,14 @@ dropins-enable(){
 # Make a symlink from the config file to the dropin location
 dropins-enable-overlay(){
 	dropins-clean
-	ln -s $KUBERNETES_DIR/dropins/docker-overlay.conf $DOCKER_DROPIN_DIR
+	ln -s $KUBERNETES_DIR/dropins/docker-overlay.conf $DOCKER_DROPIN_DIR/
 	dropins-enable
 }
 
 # Make a symlink from the config file to the dropin location
 dropins-enable-flannel(){
 	dropins-clean
-	ln -s $KUBERNETES_DIR/dropins/docker-flannel.conf $DOCKER_DROPIN_DIR
+	ln -s $KUBERNETES_DIR/dropins/docker-flannel.conf $DOCKER_DROPIN_DIR/
 	dropins-enable
 }
 
@@ -335,6 +342,58 @@ updateline(){
 	fi
 }
 
+wait_for_system_docker(){
+	# Wait for system-docker to start by "docker ps"-ing every second
+	local SYSTEM_DOCKER_SECONDS=0
+	while [[ $(docker -H unix:///var/run/system-docker.sock ps 2>&1 1>/dev/null; echo $?) != 0 ]]; do
+		((SYSTEM_DOCKER_SECONDS++))
+		if [[ ${SYSTEM_DOCKER_SECONDS} == ${TIMEOUT_FOR_SERVICES} ]]; then
+		  	echo "system-docker failed to start. Exiting..." 2>&1
+		  	exit
+		fi
+	  sleep 1
+	done
+}
+
+wait_for_etcd(){
+	# Wait for the etcd to answer instead of a timeout. This is faster and more reliable
+	local ETCD_SECONDS=0
+	while [[ $(curl -fs http://localhost:4001/v2/machines 2>&1 1>/dev/null; echo $?) != 0 ]]; do
+		((ETCD_SECONDS++))
+		if [[ ${ETCD_SECONDS} == ${TIMEOUT_FOR_SERVICES} ]]; then
+		  	echo "etcd failed to start. Exiting..." 2>&1
+		  	exit
+		fi
+	  sleep 1
+	done
+}
+
+wait_for_flannel(){
+	# Wait for the flannel subnet.env file to be created instead of a timeout. This is faster and more reliable
+	local FLANNEL_SECONDS=0
+	while [[ ! -f /var/lib/kubernetes/flannel/subnet.env ]]; do
+		((FLANNEL_SECONDS++))
+		if [[ ${FLANNEL_SECONDS} == ${TIMEOUT_FOR_SERVICES} ]]; then
+		  	echo "flannel failed to start. Exiting..." 2>&1
+		  	exit
+		fi
+	sleep 1
+	done
+}
+
+wait_for_docker(){
+	# Wait for system-docker to start by "docker ps"-ing every second
+	local DOCKER_SECONDS=0
+	while [[ $(docker ps 2>&1 1>/dev/null; echo $?) != 0 ]]; do
+		((DOCKER_SECONDS++))
+		if [[ ${DOCKER_SECONDS} == ${TIMEOUT_FOR_SERVICES} ]]; then
+		  	echo "docker failed to start. Exiting..." 2>&1
+		  	exit
+		fi
+	  sleep 1
+	done
+}
+
 # ----------------------------------------------- MAIN -------------------------------------------
 
 start-master(){
@@ -366,26 +425,25 @@ start-master(){
 
 	# Enable system-docker
 	systemctl restart system-docker
-	sleep 5
+	wait_for_system_docker
 
 	# Enable and start our bootstrap services
 	systemctl enable etcd
 	systemctl start etcd
 
-	sleep 8
+	wait_for_etcd
 
 	systemctl enable flannel
 	systemctl start flannel
 
 	# Wait for etcd and flannel
-	sleep 8
-	# TODO: wait for flannel file
+	wait_for_flannel
 
 	# Create a symlink to the dropin location, so docker will use flannel. Also starts docker
 	dropins-enable-flannel
 
 	# Wait for docker to come up
-	sleep 5
+	wait_for_docker
 
 	echo "Starting master components in docker containers"
 
@@ -438,21 +496,20 @@ EOF
 
 	# Enable system-docker
 	systemctl restart system-docker
-	sleep 5
+	wait_for_system_docker
 
 	# Enable and start our bootstrap services
 	systemctl enable flannel
 	systemctl start flannel
 
 	# Wait for flannel
-	sleep 8
-	# TODO: wait for flannel file
+	wait_for_flannel
 
 	# Create a symlink to the dropin location, so docker will use flannel
 	dropins-enable-flannel
 
 	# Wait for docker to come up
-	sleep 5
+	wait_for_docker
 
 	echo "Starting worker components in docker containers"
 

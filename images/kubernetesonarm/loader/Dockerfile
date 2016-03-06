@@ -1,3 +1,3 @@
 FROM scratch
-ADD loader /
+COPY loader /
 CMD ["/loader"]

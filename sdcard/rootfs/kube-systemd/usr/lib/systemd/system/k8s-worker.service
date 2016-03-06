@@ -6,22 +6,21 @@ After=docker.service
 EnvironmentFile=/etc/kubernetes/k8s.conf
 ExecStartPre=-/usr/bin/docker kill k8s-worker k8s-worker-proxy
 ExecStartPre=-/usr/bin/docker rm k8s-worker k8s-worker-proxy
-ExecStartPre=-/bin/sh -c "mkdir -p /etc/kubernetes/static-pods/worker"
+ExecStartPre=-/bin/sh -c "mkdir -p /etc/kubernetes/static-pods/worker; mount -B /var/lib/kubelet /var/lib/kubelet; mount --make-shared /var/lib/kubelet"
 ExecStart=/bin/sh -c "exec docker run \
 					--name=k8s-worker \
 					--net=host \
+					--pid=host \
 					-v /etc/kubernetes/static-pods/worker:/etc/kubernetes/manifests \
-					-v /:/rootfs:ro \
 					-v /sys:/sys:ro \
 					-v /dev:/dev \
 					-v /var/lib/docker/:/var/lib/docker:rw \
-					-v /var/lib/kubelet:/var/lib/kubelet:rw \
+					-v /var/lib/kubelet:/var/lib/kubelet:shared \
 					-v /var/run:/var/run:rw \
 					--privileged \
-					--pid=host \
-					kubernetesonarm/hyperkube /hyperkube kubelet \
+					kubernetesonarm/hyperkube \
+					/hyperkube kubelet \
 						--allow-privileged \
-						--containerized \
 						--pod_infra_container_image=kubernetesonarm/pause \
 						--api-servers=http://${K8S_MASTER_IP}:8080 \
 						--cluster-dns=${DNS_IP} \
@@ -38,7 +37,7 @@ ExecStartPost=/usr/bin/docker run -d \
 						--privileged \
 						kubernetesonarm/hyperkube /hyperkube proxy \
 							--master=http://${K8S_MASTER_IP}:8080 \
-							--proxy-mode=userspace \
+							--proxy-mode=iptables \
 							--resource-container="" \
 							--v=2
 ExecStop=/usr/bin/docker stop k8s-worker k8s-worker-proxy

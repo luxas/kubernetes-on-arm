@@ -12,12 +12,18 @@ ExecStart=/usr/bin/docker -H unix:///var/run/system-docker.sock run \
 					--name=k8s-etcd \
 					-v /var/lib/kubernetes/etcd:/var/etcd/data \
 					kubernetesonarm/etcd
-ExecStartPost=/bin/sh -c "sleep 8;docker -H unix:///var/run/system-docker.sock run \
+ExecStartPost=/bin/sh -c "while [ $(curl -fs http://localhost:4001/v2/machines 2>&1 1>/dev/null; echo $?) != 0 ]; do sleep 1; done; \
+				docker -H unix:///var/run/system-docker.sock run \
 					--rm \
 					--net=host \
 					kubernetesonarm/etcd \
 					etcdctl \
-					set /coreos.com/network/config '{ \"Network\": \"${FLANNEL_SUBNET}\" }'"
+					set /coreos.com/network/config '{ \
+						\"Network\": \"${FLANNEL_SUBNET}\", \
+						\"Backend\": { \
+							\"Type\": \"${FLANNEL_BACKEND}\" \
+						} \
+					}'"
 ExecStop=/usr/bin/docker -H unix:///var/run/system-docker.sock stop k8s-etcd
 
 [Install]

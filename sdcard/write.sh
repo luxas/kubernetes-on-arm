@@ -47,6 +47,7 @@ Explanation:
 		- Currently supported:
 			- rpi - Raspberry Pi A, A+, B, B+, ZERO
 			- rpi-2 - Raspberry Pi 2 Model B
+			- rpi-3 - Raspberry Pi 3 Model B
 			- parallella - Adepteva Parallella board. Note: Awfully slow. Do not use as-is. But you're welcome to hack and improve it. Should have a newer kernel (only with archlinux)
 			- cubietruck - Cubietruck (only with archlinux)
 			- bananapro - Banana Pro (only with archlinux)
@@ -54,9 +55,10 @@ Explanation:
 		- Currently supported:
 			- archlinux - Arch Linux ARM
 			- hypriotos - HypriotOS
+			- rancheros - RancherOS (only with rpi-2 and rpi-3)
 	rootfs - Prepopulated rootfs with scripts and such.
 		- Currently supported: 
-			- kube-systemd - Kubernetes scripts prepopulated
+			- kube-systemd - Kubernetes scripts prepopulated (only with archlinux and hypriotos)
 
 Example:
 sdcard/write.sh /dev/sdb rpi-2 archlinux kube-systemd
@@ -158,6 +160,12 @@ fi
 # Ensure the rootfs exists	
 if [[ ! -d rootfs/$ROOTFSNAME ]]; then
 	echo "rootfs/$ROOTFSNAME not found. That rootfs doesn't exist. Exiting..."
+	rm -r $TMPDIR
+	exit 1
+fi
+
+if [[ $ROOTFSNAME == "kube-systemd" && $OSNAME == "rancheros" ]]; then
+	echo "rancheros doesn't support kube-systemd. Exiting..."
 	rm -r $TMPDIR
 	exit 1
 fi

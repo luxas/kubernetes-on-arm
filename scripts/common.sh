@@ -1,5 +1,6 @@
 K8S_PREFIX="kubernetesonarm"
-IMAGES=("$K8S_PREFIX/flannel $K8S_PREFIX/etcd $K8S_PREFIX/hyperkube $K8S_PREFIX/pause $K8S_PREFIX/skydns $K8S_PREFIX/kube2sky $K8S_PREFIX/exechealthz $K8S_PREFIX/registry")
+# Todo: make this dynamic
+IMAGES=("$K8S_PREFIX/flannel $K8S_PREFIX/etcd $K8S_PREFIX/hyperkube $K8S_PREFIX/pause $K8S_PREFIX/skydns $K8S_PREFIX/kube2sky $K8S_PREFIX/exechealthz $K8S_PREFIX/registry $K8S_PREFIX/loadbalancer $K8S_PREFIX/heapster")
 KUBE_SCRIPTS_TEMP="/tmp/kubernetes-on-arm-scripts"
 
 parse-path-or-disc(){

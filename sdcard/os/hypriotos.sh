@@ -31,7 +31,7 @@ mountpartitions(){
 # Invoked by sdcard/write
 initos(){
 	case $MACHINENAME in
-		rpi|rpi-2)
+		rpi|rpi-2|rpi-3)
 			generaldownload $RPI_DOWNLOAD_LINK $RPI_HYPRIOTOS_RELEASE $PARTITION2;;
 		*)
 			exit;;
@@ -41,7 +41,7 @@ initos(){
 # Invoked by sdcard/write
 cleanup(){
 	case $MACHINENAME in
-		rpi|rpi-2)
+		rpi|rpi-2|rpi-3)
 			umount_root;;
 		*)
 			exit;;

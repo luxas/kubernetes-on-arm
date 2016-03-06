@@ -9,7 +9,4 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN cp -r /usr/share/locale/en_GB /tmp && \
 	rm -rf /usr/share/man/?? /usr/share/man/??_* /usr/share/doc/* /usr/share/locale/* && \
 	mv /tmp/en_GB /usr/share/locale/en_GB && \
-	chmod +x /usr/bin/apt-install && \
-	sync && \
-	apt-install nano
-# Nano is good to have
+	chmod +x /usr/bin/apt-install

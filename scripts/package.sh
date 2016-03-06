@@ -21,24 +21,25 @@ main() {
 	docker save ${IMAGES[@]} | gzip > $OUT/images.tar.gz
 
 	echo "Bundling binaries: "
-	cd /etc/kubernetes/binaries/
+	cd images/kubernetesonarm/_bin/latest
 	tar -czf $OUT/binaries.tar.gz *
 	cd -
 
-	cp /etc/kubernetes/binaries/kubectl $OUT
+	cp images/kubernetesonarm/_bin/latest/kubectl $OUT
 
 	# Make the .deb file from master as the default option
 	scripts/mkdeb.sh $OUT $PACKAGE_BRANCH $PACKAGE_REVISION
 
 	echo "BUILD_DATE=$(date +%d%m%y_%H%M)" >> $OUT/meta.sh
 
-	if [[ -f /etc/kubernetes/SDCard_metadata.conf ]]; then
-		source /etc/kubernetes/SDCard_metadata.conf
-		echo "REPO_COMMIT=$K8S_ON_ARM_COMMIT" >> $OUT/meta.sh
+	# Try to fetch latest commit from git
+	COMMIT=$(git log --oneline 2>&1 | head -1 | awk '{print $1}')
+	if [[ $COMMIT != "bash:"* && $COMMIT != "fatal:"* ]]; then
+		echo "REPO_COMMIT=$COMMIT" >> $OUT/meta.sh
 	fi
 
-	if [[ -f /etc/kubernetes/source/version ]]; then
-		source /etc/kubernetes/source/version
+	if [[ -f version ]]; then
+		source version
 		echo "REPO_VERSION=$VERSION" >> $OUT/meta.sh
 	fi
 
