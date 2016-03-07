@@ -8,6 +8,22 @@
     "hostNetwork": true,
     "containers":[
       {
+        "name": "etcd",
+        "image": "kubernetesonarm/etcd",
+        "imagePullPolicy": "IfNotPresent",
+        "command": [
+                "/usr/bin/etcd",
+                "--listen-client-urls=http://127.0.0.1:4001",
+                "--advertise-client-urls=http://127.0.0.1:4001",
+                "--data-dir=/var/etcd/data"
+        ],
+        "volumeMounts": [{
+            "name": "etcddata",
+            "mountPath": "/var/etcd",
+            "readOnly": false
+        }]
+      },
+      {
         "name": "controller-manager",
         "image": "kubernetesonarm/hyperkube",
         "imagePullPolicy": "IfNotPresent",
@@ -77,13 +93,12 @@
     "volumes": [
       {
         "name": "kubecerts",
-        "hostPath": {
-          "path": "/var/lib/kubernetes/certs"
-        }
+        "emptyDir": {}
+      },
+      {
+        "name": "etcddata",
+        "emptyDir": {}
       }
     ]
   }
 }
-
-
-

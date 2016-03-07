@@ -1,3 +1,3 @@
 FROM scratch
-ADD kube2sky /
+COPY kube2sky /
 ENTRYPOINT ["/kube2sky"]

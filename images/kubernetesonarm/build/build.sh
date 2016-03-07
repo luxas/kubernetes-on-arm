@@ -7,12 +7,11 @@ docker build -t kubernetesonarm/build .
 
 # Then copy out the binaries
 CID=$(docker run -d kubernetesonarm/build /bin/bash)
-BIN="../_bin"
-OUT="$BIN/latest"
+BIN=$(pwd)/../_bin
+OUT=$BIN/latest
 
 # If there is a latest version, move to build date
-if [ -d "$OUT" ]
-then
+if [[ -d "$OUT" ]]; then
 	# Now is the variable $BUILD_DATE available, which is the latest build date
 	source "$OUT/version.sh"
 

@@ -405,7 +405,7 @@ If your cluster won't start, try `kube-config delete-data`. That will remove all
 
 ## Contributing
 
-I would be really glad to review you Pull Request! One thing would be good to remember though. I develop on the `dev` branch, so it would be great if you target that one instead of `master`
+I would be really glad to review your Pull Request! One thing would be good to remember though. I develop on the `dev` branch, so it would be great if you target that one instead of `master`
 
 Thanks!
 

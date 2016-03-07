@@ -2,12 +2,14 @@
 
 cd "$( dirname "${BASH_SOURCE[0]}" )"
 
-DOCKER_BRANCH=${DOCKER_BRANCH:-"v1.10.0"}
+DOCKER_BRANCH=${DOCKER_BRANCH:-"v1.10.2"}
 
 # Download docker
-git clone -b $DOCKER_BRANCH --single-branch https://github.com/docker/docker
+git clone https://github.com/docker/docker
 
 cd docker
+
+git checkout $DOCKER_BRANCH
 
 # Patch docker
 #mv vendor/src/github.com/opencontainers/runc/libcontainer/seccomp/jump_{amd64,linux}.go

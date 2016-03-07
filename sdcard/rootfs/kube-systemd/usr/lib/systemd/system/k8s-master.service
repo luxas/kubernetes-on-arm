@@ -10,18 +10,17 @@ ExecStartPre=-/bin/sh -c "mkdir -p /etc/kubernetes/static-pods/master"
 ExecStart=/bin/sh -c "exec docker run \
 					--name=k8s-master \
 					--net=host \
+					--pid=host \
 					-v /etc/kubernetes/static-pods/master:/etc/kubernetes/manifests-multi \
-					-v /:/rootfs:ro \
 					-v /sys:/sys:ro \
 					-v /dev:/dev \
 					-v /var/lib/docker/:/var/lib/docker:rw \
-					-v /var/lib/kubelet:/var/lib/kubelet:rw \
+					-v /var/lib/kubelet:/var/lib/kubelet:shared \
 					-v /var/run:/var/run:rw \
 					--privileged \
-					--pid=host \
-					kubernetesonarm/hyperkube /hyperkube kubelet \
+					kubernetesonarm/hyperkube \
+					/hyperkube kubelet \
 						--allow-privileged \
-						--containerized \
 						--pod_infra_container_image=kubernetesonarm/pause \
 						--api-servers=http://localhost:8080 \
 						--cluster-dns=${DNS_IP} \

@@ -42,11 +42,6 @@ rootfs
 rm $ROOT/etc/kubernetes/dynamic-env/env.conf
 rm -r $ROOT/etc/kubernetes/source/.git
 
-# Fix that the kubernetes-on-arm folder shouldn't be there
-# TODO: make this better in the future
-# cp -r $ROOT/etc/kubernetes/source/kubernetes-on-arm/* $ROOT/etc/kubernetes/source
-# rm -r $ROOT/etc/kubernetes/source/kubernetes-on-arm
-
 
 ### PART 2: MAKE DEB
 # Inspired by: https://github.com/hypriot/rpi-docker-builder/blob/master/builder.sh
@@ -72,7 +67,7 @@ mkdir -p $OUT_DIR
 
 # The package process
 fakeroot dpkg -b $ROOT $OUT_DIR
-(cd $ROOT; tar -czf $OUT_DIR/kubernetes-on-arm_${VERSION}-${PACKAGE_REVISION}_armhf.tar.gz .)
+(cd $ROOT; fakeroot tar -czf $OUT_DIR/kubernetes-on-arm_${VERSION}-${PACKAGE_REVISION}_armhf.tar.gz .)
 
 # Output info
 echo ".deb package size (uncompressed): $PACKAGE_SIZE kByte"

@@ -1,3 +1,3 @@
 FROM scratch
-ADD pause /
+COPY pause /
 ENTRYPOINT ["/pause"]

@@ -2,6 +2,14 @@
 
 These images are built on a Raspberry Pi 2.
 
+## 0.6.5
+
+55 files changed, 602 insertions(+), 659 deletions(-)
+
+## 0.6.3
+
+66 files changed, 865 insertions(+), 1153 deletions(-)
+
 ## 0.6.2
 
 74 files changed, 1615 insertions(+), 611 deletions(-)
@@ -19,7 +27,6 @@ These images are built on a Raspberry Pi 2.
   - kubernetesonarm/skydns: 6 s
   - kubernetesonarm/kube2sky: 11 s
   - kubernetesonarm/registry: 112 s
-
 
 ```bash
 $ ls -lh

@@ -5,7 +5,7 @@ SDCARDSIZE=${SDCARDSIZE:-""}
 mountpartitions(){
 	# Partition the sd card
 	case $MACHINENAME in
-		rpi|rpi-2|parallella)
+		rpi|rpi-2|rpi-3|parallella)
 			generalformat 100;; # Make 100 MB fat partition for the RPi
 		cubietruck|bananapro)
 			allwinnerformat;;
@@ -17,7 +17,7 @@ mountpartitions(){
 # Invoked by sdcard/write
 initos(){
 	case $MACHINENAME in
-		rpi|rpi-2|parallella)
+		rpi|rpi-2|rpi-3|parallella)
 			generaldownload;;
 		cubietruck|bananapro)
 			allwinnerdownload;;
@@ -29,7 +29,7 @@ initos(){
 # Invoked by sdcard/write
 cleanup(){
 	case $MACHINENAME in
-		rpi|rpi-2|parallella)
+		rpi|rpi-2|rpi-3|parallella)
 			umount_boot_and_root;;
 		cubietruck|bananapro)
 			umount_root;;
@@ -89,8 +89,13 @@ EOF
 
 # Download the OS, and redirect the tar warnings to the log
 generaldownload(){
+	ARCH_BOARD=$MACHINENAME
+	if [[ $MACHINENAME == "rpi-3" ]]; then
+		ARCH_BOARD="rpi-2"
+	fi
+
 	# Download, redirect stderr (all errors) to stdout, which in turn is appended to a log file
-	curl -sSL -k http://archlinuxarm.org/os/ArchLinuxARM-${MACHINENAME}-latest.tar.gz | tar -xz -C $ROOT >> $LOGFILE 2>&1
+	curl -sSL -k http://archlinuxarm.org/os/ArchLinuxARM-${ARCH_BOARD}-latest.tar.gz | tar -xz -C $ROOT >> $LOGFILE 2>&1
 
 	sync
 

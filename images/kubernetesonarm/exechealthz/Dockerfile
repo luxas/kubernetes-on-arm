@@ -1,3 +1,3 @@
 FROM luxas/alpine
-ADD exechealthz /
+COPY exechealthz /
 ENTRYPOINT ["/exechealthz"]

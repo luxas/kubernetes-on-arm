@@ -65,7 +65,7 @@
             "/hyperkube",
             "proxy",
             "--master=http://127.0.0.1:8080",
-            "--proxy-mode=userspace",
+            "--proxy-mode=iptables",
             "--resource-container=\"\"",
             "--v=2"
         ],
