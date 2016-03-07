@@ -52,8 +52,9 @@ cleanup(){
 # Takes an URL (.img.zip file) to download an the name of the downloaded file. Assumes that the extracted and the downloaded file has the same names except for the extension
 generaldownload(){
 
-	# Install unzip if not present
+	# Install unzip and partprobe if not present
 	require unzip unzip
+	require partprobe partprobe
 
 	# We can't write this .img file to /tmp because /tmp has a limit of 462MB
 	DLDIR=/etc/tmp/downloadhypriot
@@ -78,6 +79,11 @@ generaldownload(){
 	dd if=$DLDIR/${RELEASE}.img of=$SDCARD bs=4M
 
 	sync
+
+  # Clear old mounts, if any
+  umount $ROOT_PARTITION
+	# Force kernel to reload partitions
+  partprobe
 
 	mount $ROOT_PARTITION $ROOT
 	# Will take ~9 mins on a Pi
