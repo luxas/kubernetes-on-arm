@@ -62,11 +62,13 @@ Explanation:
             - parallella - Adepteva Parallella board. Note: Awfully slow. Do not use as-is. But you're welcome to hack and improve it. Should have a newer kernel (only with archlinux)
             - cubietruck - Cubietruck (only with archlinux)
             - bananapro - Banana Pro (only with archlinux)
+            - odroid-c2 - ODroid-C2 (only with ubuntu)
     os - The operating system which should be downloaded and installed.
         - Currently supported:
             - archlinux - Arch Linux ARM
             - hypriotos - HypriotOS
             - rancheros - RancherOS (only with rpi-2 and rpi-3)
+            - ubuntu    - Ubuntu (only odroid-c2)
     rootfs - Prepopulated rootfs with scripts and such.
         - Currently supported: 
             - kube-systemd - Kubernetes scripts prepopulated (only with archlinux and hypriotos)
