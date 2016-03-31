@@ -15,7 +15,7 @@ os_install(){
     chmod +x /usr/bin/docker
 
     # Add the docker group, so the daemon starts
-    groupadd docker
+    groupadd -f docker
 
     # Enable the service files
     mv /usr/lib/systemd/system/docker.service{.backup,}

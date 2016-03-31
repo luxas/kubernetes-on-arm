@@ -22,7 +22,7 @@ os_install(){
     # If the docker group doesn't exist, make it
     if [[ -z $(grep docker /etc/group) ]]; then
         # Add the docker group, so the daemon starts
-        groupadd docker
+        groupadd -f docker
     fi
     
     # Ensure systemctl has the latest files in memory
