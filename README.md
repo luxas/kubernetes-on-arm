@@ -74,7 +74,7 @@ Arch Linux users:
  - These scripts requires root. So if you login via **alarm**, then `su root` when you´re going to do some serious hacking :)
 
 HypriotOS users:
- - The user/password is: **pi/raspberry** or **root/hypriot**
+ - The user/password is: **pirate/hypriot**
  - Remember to prepend all commands with `sudo` if you are the `pi` user
    - Sometimes, it's even required to prepend commands with `sudo env PATH=$PATH ...`
 
