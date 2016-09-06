@@ -1,0 +1,12 @@
+[Unit]
+Description=Docker Socket for the API
+PartOf=system-docker.service
+
+[Socket]
+ListenStream=/var/run/system-docker.sock
+SocketMode=0660
+SocketUser=root
+SocketGroup=docker
+
+[Install]
+WantedBy=sockets.target

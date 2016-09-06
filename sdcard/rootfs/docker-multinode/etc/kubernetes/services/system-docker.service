@@ -1,0 +1,25 @@
+[Unit]
+Description=Docker Application Container Engine
+After=network.target system-docker.socket
+Requires=system-docker.socket
+
+[Service]
+Type=notify
+EnvironmentFile=/etc/kubernetes/k8s.conf
+ExecStart=/usr/bin/docker daemon \
+    --host=unix:///var/run/system-docker.sock \
+    --storage-driver=${DOCKER_STORAGE_DRIVER} \
+    --exec-opt native.cgroupdriver=cgroupfs \
+    --exec-root=/var/run/system-docker \
+    --pidfile=/var/run/system-docker.pid \
+    --iptables=false \
+    --ip-masq=false \
+    --bridge=none \
+    --graph=/var/lib/system-docker
+MountFlags=slave
+LimitNOFILE=1048576
+LimitNPROC=1048576
+LimitCORE=infinity
+
+[Install]
+WantedBy=multi-user.target
