@@ -99,7 +99,7 @@ generaldownload(){
         partprobe
     fi
 
-    mount $ROOT_PARTITION $ROOT
+    sleep 1s && mount $ROOT_PARTITION $ROOT
     # Will take ~9 mins on a Pi
 }
 
