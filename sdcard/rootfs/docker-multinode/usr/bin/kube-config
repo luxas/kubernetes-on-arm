@@ -7,6 +7,11 @@ if [[ ${K8S_DEBUG} == 1 ]]; then
     set -x
 fi
 
+if $(hash git 2>&1 | grep -q "not found"); then
+    echo "git not installed. You need git to continue."
+    exit 1
+fi
+
 INSTALL_DEFAULT_TIMEZONE="Europe/Helsinki"
 INSTALL_DEFAULT_HOSTNAME="kubepi"
 INSTALL_DEFAULT_STORAGEDRIVER="overlay"
